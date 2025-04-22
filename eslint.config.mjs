@@ -13,10 +13,26 @@ const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
     ignores: [
-      "./src/generated/**/*",
+      // Main Prisma generated files
+      "./src/generated/prisma/client.js",
+      "./src/generated/prisma/default.js",
+      "./src/generated/prisma/edge.js",
+      "./src/generated/prisma/index-browser.js",
       "./src/generated/prisma/index.d.ts",
-      "./src/generated/prisma/runtime/library.d.ts",
+      "./src/generated/prisma/wasm.js",
+
+      // Runtime files
+      "./src/generated/prisma/runtime/*.js",
+      "./src/generated/prisma/runtime/*.d.ts",
+
+      // Catch all for any other generated files
+      "./src/generated/prisma/**/*.js",
+      "./src/generated/prisma/**/*.d.ts",
     ],
+  },
+  {
+    files: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"],
+    excludes: ["./src/generated/**/*"],
     rules: {
       "@typescript-eslint/no-unused-vars": "off",
       "@typescript-eslint/no-require-imports": "off",
