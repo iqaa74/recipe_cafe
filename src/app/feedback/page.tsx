@@ -7,7 +7,7 @@ interface Feedback {
   id: number;
   name: string;
   email: string;
-  rating: number;
+  ratings: number;
   remarks: string;
   strMeal: string;
   idMeal: string;
@@ -17,7 +17,7 @@ interface Feedback {
 export default function FeedbackPage() {
   const { data: feedbacks, isLoading, error } = useFeedback();
 
-  const renderStars = (rating: number) => {
+  const renderStars = (ratings: number) => {
     return (
       <div className="flex gap-1">
         {[1, 2, 3, 4, 5].map((star) => (
@@ -25,7 +25,7 @@ export default function FeedbackPage() {
             key={star}
             xmlns="http://www.w3.org/2000/svg"
             className={`h-5 w-5 ${
-              star <= rating ? "text-yellow-400" : "text-gray-300"
+              star <= ratings ? "text-yellow-400" : "text-gray-300"
             }`}
             fill="currentColor"
             viewBox="0 0 24 24"
@@ -78,7 +78,7 @@ export default function FeedbackPage() {
                   {feedback.strMeal}
                 </Link>
               </div>
-              {renderStars(feedback.rating)}
+              {renderStars(feedback.ratings)}
             </div>
 
             <p className="text-gray-700 dark:text-gray-800">

@@ -6,7 +6,7 @@ import { use, useState } from "react";
 interface FeedbackForm {
   name: string;
   email: string;
-  rating: number;
+  ratings: number;
   remarks: string;
 }
 
@@ -21,7 +21,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const [feedback, setFeedback] = useState<FeedbackForm>({
     name: "",
     email: "",
-    rating: 0,
+    ratings: 0,
     remarks: "",
   });
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
@@ -65,7 +65,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     setFeedback({
       name: "",
       email: "",
-      rating: 0,
+      ratings: 0,
       remarks: "",
     });
   };
@@ -83,7 +83,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
           <button
             key={star}
             type="button"
-            onClick={() => setFeedback({ ...feedback, rating: star })}
+            onClick={() => setFeedback({ ...feedback, ratings: star })}
             onMouseEnter={() => setHoveredStar(star)}
             onMouseLeave={() => setHoveredStar(0)}
             className="focus:outline-none"
@@ -91,7 +91,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className={`h-8 w-8 ${
-                star <= (hoveredStar || feedback.rating)
+                star <= (hoveredStar || feedback.ratings)
                   ? "text-yellow-400"
                   : "text-white-300"
               } transition-colors duration-150`}
@@ -272,7 +272,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
             <button
               type="submit"
-              disabled={!feedback.rating || !feedback.name || !feedback.email}
+              disabled={!feedback.ratings || !feedback.name || !feedback.email}
               className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
             >
               Submit Feedback

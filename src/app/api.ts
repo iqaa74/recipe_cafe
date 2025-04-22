@@ -23,7 +23,7 @@ interface Feedback {
   id: number;
   name: string;
   email: string;
-  rating: number;
+  ratings: number;
   remarks: string;
   strMeal: string;
   idMeal: string;
