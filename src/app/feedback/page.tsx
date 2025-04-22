@@ -2,6 +2,7 @@
 
 import { useFeedback } from "../api";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface Feedback {
   id: number;
@@ -15,7 +16,12 @@ interface Feedback {
 }
 
 export default function FeedbackPage() {
+  const router = useRouter();
   const { data: feedbacks, isLoading, error } = useFeedback();
+
+  const handleBack = () => {
+    router.back();
+  };
 
   const renderStars = (ratings: number) => {
     return (
@@ -56,6 +62,26 @@ export default function FeedbackPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <button
+        onClick={handleBack}
+        className="mb-4 px-6 py-2 bg-[#FB6F92] text-white rounded-lg hover:bg-[#fa5d85] transition-colors flex items-center gap-2"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M19 12H5M12 19l-7-7 7-7" />
+        </svg>
+        Back
+      </button>
+
       <h1 className="text-3xl font-bold mb-8 text-gray-800 dark:text-black">
         Recipe Feedback
       </h1>

@@ -3,6 +3,7 @@
 import { useMealById } from "../../api";
 import { use, useState, useEffect } from "react";
 import ReactConfetti from "react-confetti";
+import { useRouter } from "next/navigation";
 
 interface FeedbackForm {
   name: string;
@@ -17,6 +18,7 @@ interface Ingredient {
 }
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
+  const router = useRouter();
   const resolvedParams = use(params);
   const { data: meal, isLoading, error } = useMealById(resolvedParams.id);
 
@@ -38,6 +40,10 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     width: typeof window !== "undefined" ? window.innerWidth : 0,
     height: typeof window !== "undefined" ? window.innerHeight : 0,
   });
+
+  const handleBack = () => {
+    router.back();
+  };
 
   useEffect(() => {
     const handleResize = () => {
@@ -155,6 +161,27 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
   return (
     <div className="max-w-8xl mx-auto p-6 space-y-8">
+      {/* Add Back button at the top */}
+      <button
+        onClick={handleBack}
+        className="mb-4 px-6 py-2 bg-[#FB6F92] text-white rounded-lg hover:bg-[#fa5d85] transition-colors flex items-center gap-2"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M19 12H5M12 19l-7-7 7-7" />
+        </svg>
+        Back
+      </button>
+
       {showConfetti && (
         <ReactConfetti
           width={windowDimension.width}
