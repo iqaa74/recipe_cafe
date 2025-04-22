@@ -13,7 +13,9 @@ const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
     ignores: [
-      "./src/generated/**/*", // Ignore all files in the generated directory
+      "./src/generated/**/*",
+      "./src/generated/prisma/index.d.ts",
+      "./src/generated/prisma/runtime/library.d.ts",
     ],
     rules: {
       "@typescript-eslint/no-unused-vars": "off",
@@ -23,15 +25,6 @@ const eslintConfig = [
       "@typescript-eslint/no-wrapper-object-types": "off",
       "@typescript-eslint/no-unused-expressions": "off",
       "@typescript-eslint/no-this-alias": "off",
-      "@typescript-eslint/ban-types": [
-        "error",
-        {
-          types: {
-            Function: false,
-          },
-          extendDefaults: true,
-        },
-      ],
       "@typescript-eslint/no-empty-interface": "off",
       "@typescript-eslint/no-empty-object-type": "off",
     },
