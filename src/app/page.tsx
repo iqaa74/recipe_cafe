@@ -138,7 +138,7 @@ export default function Home() {
 
       {!isLoading && searchTerm && displayMeals.length === 0 && (
         <div className="text-center py-8">
-          No recipes found for "{searchTerm}"
+          No recipes found for &quot;{searchTerm}&quot;
         </div>
       )}
 
