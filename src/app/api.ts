@@ -84,21 +84,6 @@ export const useCategories = (): UseQueryResult<string[], Error> => {
   });
 };
 
-// Filter by category
-export const useMealsByCategory = (
-  category: string
-): UseQueryResult<Meal[], Error> => {
-  return useQuery({
-    queryKey: ["mealsByCategory", category],
-    queryFn: async () => {
-      const response = await fetch(`${BASE_URL}/filter.php?c=${category}`);
-      const data: MealResponse = await response.json();
-      return data.meals || [];
-    },
-    enabled: !!category,
-  });
-};
-
 // List all areas
 export const useAreas = (): UseQueryResult<string[], Error> => {
   return useQuery({
@@ -164,4 +149,26 @@ export const useFeedback = (): UseQueryResult<Feedback[], Error> => {
       return response.json();
     },
   });
+};
+
+export const submitFeedback = async (feedbackData: {
+  name: string;
+  email: string;
+  ratings: number;
+  remarks: string;
+  strMeal: string;
+}) => {
+  const response = await fetch("/api/feedback", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(feedbackData),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to submit feedback");
+  }
+
+  return response.json();
 };

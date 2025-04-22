@@ -1,6 +1,6 @@
 "use client";
 
-import { useMealById } from "../../api";
+import { useMealById, submitFeedback } from "../../api";
 import { use, useState } from "react";
 
 interface FeedbackForm {
@@ -30,6 +30,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const [completedInstructions, setCompletedInstructions] = useState<number[]>(
     []
   );
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
@@ -56,18 +57,29 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     );
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically send the feedback to your backend
-    console.log("Feedback submitted:", feedback);
-    setIsSubmitted(true);
-    // Reset form after submission
-    setFeedback({
-      name: "",
-      email: "",
-      ratings: 0,
-      remarks: "",
-    });
+    setIsSubmitting(true);
+
+    try {
+      await submitFeedback({
+        ...feedback,
+        strMeal: meal?.strMeal || "",
+      });
+
+      setIsSubmitted(true);
+      setFeedback({
+        name: "",
+        email: "",
+        ratings: 0,
+        remarks: "",
+      });
+    } catch (error) {
+      console.error("Error submitting feedback:", error);
+      alert("Failed to submit feedback. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleInstructionToggle = (index: number) => {
@@ -272,10 +284,24 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
             <button
               type="submit"
-              disabled={!feedback.ratings || !feedback.name || !feedback.email}
-              className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+              disabled={
+                !feedback.ratings ||
+                !feedback.name ||
+                !feedback.email ||
+                isSubmitting
+              }
+              className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 relative"
             >
-              Submit Feedback
+              {isSubmitting ? (
+                <>
+                  <span className="opacity-0">Submit Feedback</span>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-5 h-5 border-t-2 border-b-2 border-white rounded-full animate-spin"></div>
+                  </div>
+                </>
+              ) : (
+                "Submit Feedback"
+              )}
             </button>
           </form>
         )}
