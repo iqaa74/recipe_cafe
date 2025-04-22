@@ -19,6 +19,17 @@ interface MealResponse {
   meals: Meal[] | null;
 }
 
+interface Feedback {
+  id: number;
+  name: string;
+  email: string;
+  rating: number;
+  remarks: string;
+  strMeal: string;
+  idMeal: string;
+  createdAt: string;
+}
+
 const BASE_URL = "https://www.themealdb.com/api/json/v1/1";
 
 // Fetch random meal
@@ -138,6 +149,19 @@ export const useAllMeals = (): UseQueryResult<Meal[], Error> => {
       );
 
       return uniqueMeals;
+    },
+  });
+};
+
+export const useFeedback = (): UseQueryResult<Feedback[], Error> => {
+  return useQuery({
+    queryKey: ["feedbacks"],
+    queryFn: async () => {
+      const response = await fetch("/api/feedback");
+      if (!response.ok) {
+        throw new Error("Failed to fetch feedback");
+      }
+      return response.json();
     },
   });
 };

@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useFeedback } from "../api";
 import Link from "next/link";
 
 interface Feedback {
-  id: string;
+  id: number;
   name: string;
   email: string;
   rating: number;
@@ -15,34 +15,7 @@ interface Feedback {
 }
 
 export default function FeedbackPage() {
-  const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
-
-  // Temporary mock data - replace this with actual API call
-  useEffect(() => {
-    const mockFeedbacks: Feedback[] = [
-      {
-        id: "1",
-        name: "John Doe",
-        email: "john@example.com",
-        rating: 5,
-        remarks: "This recipe was amazing! Will definitely make it again.",
-        strMeal: "Spaghetti Carbonara",
-        idMeal: "52982",
-        createdAt: "2024-01-20T10:00:00Z",
-      },
-      {
-        id: "2",
-        name: "Jane Smith",
-        email: "jane@example.com",
-        rating: 4,
-        remarks: "Great recipe, but I added more garlic.",
-        strMeal: "Chicken Tikka Masala",
-        idMeal: "52972",
-        createdAt: "2024-01-19T15:30:00Z",
-      },
-    ];
-    setFeedbacks(mockFeedbacks);
-  }, []);
+  const { data: feedbacks, isLoading, error } = useFeedback();
 
   const renderStars = (rating: number) => {
     return (
@@ -64,14 +37,31 @@ export default function FeedbackPage() {
     );
   };
 
+  if (isLoading) {
+    return (
+      <div className="text-center py-8">
+        <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+        <p className="mt-2">Loading feedback...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-8 text-red-500">
+        Error loading feedback: {error.message}
+      </div>
+    );
+  }
+
   return (
-    <div className="container mx-auto px-4 pt-24 pb-8">
+    <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8 text-gray-800 dark:text-black">
         Recipe Feedback
       </h1>
 
       <div className="grid gap-6">
-        {feedbacks.map((feedback) => (
+        {feedbacks?.map((feedback) => (
           <div
             key={feedback.id}
             className="bg-[#FFC5D3] rounded-lg shadow-lg p-6 space-y-4"
@@ -96,18 +86,24 @@ export default function FeedbackPage() {
             </p>
 
             <div className="flex justify-between items-center text-sm text-gray-500">
-              <span>{new Date(feedback.createdAt).toLocaleDateString()}</span>
+              <span>
+                {new Date(feedback.createdAt).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </span>
               <span>{feedback.email}</span>
             </div>
           </div>
         ))}
-      </div>
 
-      {feedbacks.length === 0 && (
-        <div className="text-center py-8 text-gray-500">
-          No feedback available yet.
-        </div>
-      )}
+        {(!feedbacks || feedbacks.length === 0) && (
+          <div className="text-center py-8 text-gray-500">
+            No feedback available yet.
+          </div>
+        )}
+      </div>
     </div>
   );
 }
