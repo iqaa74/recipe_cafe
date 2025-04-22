@@ -1,16 +1,16 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { useState, useEffect } from "react";
+import Link from "next/link";
 
 interface Feedback {
   id: string;
   name: string;
   email: string;
   rating: number;
-  comment: string;
-  recipeName: string;
-  recipeId: string;
+  remarks: string;
+  strMeal: string;
+  idMeal: string;
   createdAt: string;
 }
 
@@ -21,24 +21,24 @@ export default function FeedbackPage() {
   useEffect(() => {
     const mockFeedbacks: Feedback[] = [
       {
-        id: '1',
-        name: 'John Doe',
-        email: 'john@example.com',
+        id: "1",
+        name: "John Doe",
+        email: "john@example.com",
         rating: 5,
-        comment: 'This recipe was amazing! Will definitely make it again.',
-        recipeName: 'Spaghetti Carbonara',
-        recipeId: '52982',
-        createdAt: '2024-01-20T10:00:00Z'
+        remarks: "This recipe was amazing! Will definitely make it again.",
+        strMeal: "Spaghetti Carbonara",
+        idMeal: "52982",
+        createdAt: "2024-01-20T10:00:00Z",
       },
       {
-        id: '2',
-        name: 'Jane Smith',
-        email: 'jane@example.com',
+        id: "2",
+        name: "Jane Smith",
+        email: "jane@example.com",
         rating: 4,
-        comment: 'Great recipe, but I added more garlic.',
-        recipeName: 'Chicken Tikka Masala',
-        recipeId: '52972',
-        createdAt: '2024-01-19T15:30:00Z'
+        remarks: "Great recipe, but I added more garlic.",
+        strMeal: "Chicken Tikka Masala",
+        idMeal: "52972",
+        createdAt: "2024-01-19T15:30:00Z",
       },
     ];
     setFeedbacks(mockFeedbacks);
@@ -52,7 +52,7 @@ export default function FeedbackPage() {
             key={star}
             xmlns="http://www.w3.org/2000/svg"
             className={`h-5 w-5 ${
-              star <= rating ? 'text-yellow-400' : 'text-gray-300'
+              star <= rating ? "text-yellow-400" : "text-gray-300"
             }`}
             fill="currentColor"
             viewBox="0 0 24 24"
@@ -69,7 +69,7 @@ export default function FeedbackPage() {
       <h1 className="text-3xl font-bold mb-8 text-gray-800 dark:text-black">
         Recipe Feedback
       </h1>
-      
+
       <div className="grid gap-6">
         {feedbacks.map((feedback) => (
           <div
@@ -82,17 +82,19 @@ export default function FeedbackPage() {
                   {feedback.name}
                 </h2>
                 <Link
-                  href={`/recipe/${feedback.recipeId}`}
+                  href={`/recipe/${feedback.idMeal}`}
                   className="text-[#FB6F92] hover:text-[#fa5d85] font-medium"
                 >
-                  {feedback.recipeName}
+                  {feedback.strMeal}
                 </Link>
               </div>
               {renderStars(feedback.rating)}
             </div>
-            
-            <p className="text-gray-700 dark:text-gray-800">{feedback.comment}</p>
-            
+
+            <p className="text-gray-700 dark:text-gray-800">
+              {feedback.remarks}
+            </p>
+
             <div className="flex justify-between items-center text-sm text-gray-500">
               <span>{new Date(feedback.createdAt).toLocaleDateString()}</span>
               <span>{feedback.email}</span>
@@ -100,7 +102,7 @@ export default function FeedbackPage() {
           </div>
         ))}
       </div>
-      
+
       {feedbacks.length === 0 && (
         <div className="text-center py-8 text-gray-500">
           No feedback available yet.

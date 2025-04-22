@@ -7,7 +7,7 @@ interface FeedbackForm {
   name: string;
   email: string;
   rating: number;
-  comment: string;
+  remarks: string;
 }
 
 interface Ingredient {
@@ -22,7 +22,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     name: "",
     email: "",
     rating: 0,
-    comment: "",
+    remarks: "",
   });
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -66,7 +66,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       name: "",
       email: "",
       rating: 0,
-      comment: "",
+      remarks: "",
     });
   };
 
@@ -260,9 +260,9 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
               <textarea
                 id="comment"
                 rows={4}
-                value={feedback.comment}
+                value={feedback.remarks}
                 onChange={(e) =>
-                  setFeedback({ ...feedback, comment: e.target.value })
+                  setFeedback({ ...feedback, remarks: e.target.value })
                 }
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600"
                 placeholder="Share your experience with this recipe..."
