@@ -1,7 +1,8 @@
 "use client";
 
-import { useMealById, submitFeedback } from "../../api";
-import { use, useState } from "react";
+import { useMealById } from "../../api";
+import { use, useState, useEffect } from "react";
+import ReactConfetti from "react-confetti";
 
 interface FeedbackForm {
   name: string;
@@ -18,6 +19,7 @@ interface Ingredient {
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const { data: meal, isLoading, error } = useMealById(resolvedParams.id);
+
   const [feedback, setFeedback] = useState<FeedbackForm>({
     name: "",
     email: "",
@@ -31,6 +33,23 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     []
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [windowDimension, setWindowDimension] = useState({
+    width: typeof window !== "undefined" ? window.innerWidth : 0,
+    height: typeof window !== "undefined" ? window.innerHeight : 0,
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowDimension({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
@@ -62,18 +81,34 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     setIsSubmitting(true);
 
     try {
-      await submitFeedback({
-        ...feedback,
-        strMeal: meal?.strMeal || "",
+      const response = await fetch("/api/feedback", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...feedback,
+          strMeal: meal?.strMeal || "",
+        }),
       });
 
+      if (!response.ok) {
+        throw new Error("Failed to submit feedback");
+      }
+
       setIsSubmitted(true);
+      setShowConfetti(true);
       setFeedback({
         name: "",
         email: "",
         ratings: 0,
         remarks: "",
       });
+
+      // Hide confetti after 5 seconds
+      setTimeout(() => {
+        setShowConfetti(false);
+      }, 5000);
     } catch (error) {
       console.error("Error submitting feedback:", error);
       alert("Failed to submit feedback. Please try again.");
@@ -120,6 +155,17 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
   return (
     <div className="max-w-8xl mx-auto p-6 space-y-8">
+      {showConfetti && (
+        <ReactConfetti
+          width={windowDimension.width}
+          height={windowDimension.height}
+          recycle={true}
+          numberOfPieces={200}
+          gravity={0.2}
+          colors={["#FB6F92", "#FFC5D3", "#FFE5EC", "#fff"]}
+        />
+      )}
+
       {/* Recipe content */}
       <div className="bg-[#FFC5D3] rounded-lg overflow-hidden shadow-lg">
         <div className="flex flex-col md:flex-row">
@@ -128,7 +174,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
             <img
               src={meal.strMealThumb}
               alt={meal.strMeal}
-              className="w-full h-[400px] object-cover"
+              className="w-full h-[400px] object-cover rounded-xl"
             />
           </div>
 

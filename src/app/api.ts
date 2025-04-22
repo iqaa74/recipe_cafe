@@ -1,4 +1,9 @@
-import { UseQueryResult, useQuery } from "@tanstack/react-query";
+import {
+  UseQueryResult,
+  useQuery,
+  useMutation,
+  QueryClient,
+} from "@tanstack/react-query";
 
 interface Meal {
   idMeal: string;
@@ -30,19 +35,16 @@ interface Feedback {
   createdAt: string;
 }
 
-const BASE_URL = "https://www.themealdb.com/api/json/v1/1";
+interface FeedbackData {
+  name: string;
+  email: string;
+  ratings: number;
+  remarks: string;
+  strMeal: string;
+}
 
-// Fetch random meal
-export const useRandomMeal = (): UseQueryResult<Meal, Error> => {
-  return useQuery({
-    queryKey: ["randomMeal"],
-    queryFn: async () => {
-      const response = await fetch(`${BASE_URL}/random.php`);
-      const data: MealResponse = await response.json();
-      return data.meals![0];
-    },
-  });
-};
+const BASE_URL = "https://www.themealdb.com/api/json/v1/1";
+const queryClient = new QueryClient();
 
 // Fetch meal by ID
 export const useMealById = (id: string): UseQueryResult<Meal, Error> => {
@@ -69,43 +71,6 @@ export const useSearchMeals = (
       return data.meals || [];
     },
     enabled: !!query,
-  });
-};
-
-// List all categories
-export const useCategories = (): UseQueryResult<string[], Error> => {
-  return useQuery({
-    queryKey: ["categories"],
-    queryFn: async () => {
-      const response = await fetch(`${BASE_URL}/list.php?c=list`);
-      const data = await response.json();
-      return data.meals.map((cat: { strCategory: string }) => cat.strCategory);
-    },
-  });
-};
-
-// List all areas
-export const useAreas = (): UseQueryResult<string[], Error> => {
-  return useQuery({
-    queryKey: ["areas"],
-    queryFn: async () => {
-      const response = await fetch(`${BASE_URL}/list.php?a=list`);
-      const data = await response.json();
-      return data.meals.map((area: { strArea: string }) => area.strArea);
-    },
-  });
-};
-
-// Filter by area
-export const useMealsByArea = (area: string): UseQueryResult<Meal[], Error> => {
-  return useQuery({
-    queryKey: ["mealsByArea", area],
-    queryFn: async () => {
-      const response = await fetch(`${BASE_URL}/filter.php?a=${area}`);
-      const data: MealResponse = await response.json();
-      return data.meals || [];
-    },
-    enabled: !!area,
   });
 };
 
@@ -151,24 +116,31 @@ export const useFeedback = (): UseQueryResult<Feedback[], Error> => {
   });
 };
 
-export const submitFeedback = async (feedbackData: {
-  name: string;
-  email: string;
-  ratings: number;
-  remarks: string;
-  strMeal: string;
-}) => {
-  const response = await fetch("/api/feedback", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
+export const useSubmitFeedback = () => {
+  return useMutation({
+    mutationFn: async (feedbackData: FeedbackData) => {
+      const response = await fetch("/api/feedback", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(feedbackData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to submit feedback");
+      }
+
+      return response.json();
     },
-    body: JSON.stringify(feedbackData),
+    retry: 2, // Number of retry attempts
+    onError: (error) => {
+      console.error("Mutation error:", error);
+    },
+    // Optionally invalidate and refetch queries after successful mutation
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["feedbacks"] });
+    },
   });
-
-  if (!response.ok) {
-    throw new Error("Failed to submit feedback");
-  }
-
-  return response.json();
 };
